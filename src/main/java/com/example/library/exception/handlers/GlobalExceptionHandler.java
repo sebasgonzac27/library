@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.example.library.dto.ErrorResponseDto;
 import com.example.library.dto.ValidationErrorDto;
 import com.example.library.exception.NotFoundException;
+import com.example.library.exception.ResourceAlreadyExistsException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -39,6 +40,22 @@ public class GlobalExceptionHandler {
         .build();
 
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponseDto);
+  }
+
+  @ExceptionHandler(ResourceAlreadyExistsException.class)
+  public ResponseEntity<ErrorResponseDto> handleResourceAlreadyExistsException(ResourceAlreadyExistsException exception,
+      HttpServletRequest request) {
+
+    ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
+        .timestamp(new Date().getTime())
+        .status(HttpStatus.CONFLICT.value())
+        .title("Resource already exists")
+        .detail(exception.getMessage())
+        .developerMessage(exception.getClass().getName())
+        .path(request.getRequestURI())
+        .build();
+
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponseDto);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
