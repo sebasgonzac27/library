@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.example.library.dto.ErrorResponseDto;
 import com.example.library.dto.ValidationErrorDto;
-import com.example.library.exception.NotFoundException;
+import com.example.library.exception.ResourceNotFoundException;
 import com.example.library.exception.ResourceAlreadyExistsException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,8 +26,8 @@ public class GlobalExceptionHandler {
   @Autowired
   private MessageSource messageSource;
 
-  @ExceptionHandler(NotFoundException.class)
-  public ResponseEntity<ErrorResponseDto> handleNotFoundException(NotFoundException exception,
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public ResponseEntity<ErrorResponseDto> handleNotFoundException(ResourceNotFoundException exception,
       HttpServletRequest request) {
 
     ErrorResponseDto errorResponseDto = ErrorResponseDto.builder()
