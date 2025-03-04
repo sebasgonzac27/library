@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthController {
 
-  private AuthService authService;
+  private final AuthService authService;
 
   @PostMapping("/sign-in")
   private ResponseEntity<TokenResponseDto> signIn(@RequestBody SignInRequestDto signInRequestDto) {
