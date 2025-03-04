@@ -34,9 +34,14 @@ public class UserEntity {
   @Column(nullable = false, unique = true)
   private String email;
 
+  private String password;
+
   @Enumerated(EnumType.STRING)
   private UserRoleEnum role;
 
   @OneToMany(mappedBy = "user")
   private List<LoanEntity> loans;
+
+  @OneToMany(mappedBy = "user")
+  private List<TokenEntity> tokens;
 }
