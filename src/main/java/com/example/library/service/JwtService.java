@@ -7,4 +7,7 @@ public interface JwtService {
 
   String generateRefreshToken(UserEntity user);
 
+  String extractUsername(String token);
+
+  boolean isTokenValid(String token, UserEntity user);
 }

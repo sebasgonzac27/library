@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.example.library.entity.UserEntity;
 import com.example.library.service.JwtService;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -36,6 +37,23 @@ public class JwtServiceImpl implements JwtService {
     return buildToken(user, refreshExpiration);
   }
 
+  @Override
+  public String extractUsername(String token) {
+    final Claims jwtToken = Jwts.parser()
+        .verifyWith(getSignKey())
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
+
+    return jwtToken.getSubject();
+  }
+
+  @Override
+  public boolean isTokenValid(String token, UserEntity user) {
+    final String username = extractUsername(token);
+    return (username.equals(user.getEmail())) && !isTokenExpired(token);
+  }
+
   private String buildToken(UserEntity user, Long expiration) {
     return Jwts.builder()
         .id(user.getId().toString())
@@ -50,5 +68,19 @@ public class JwtServiceImpl implements JwtService {
   private SecretKey getSignKey() {
     byte[] keyBytes = Decoders.BASE64.decode(secretKey);
     return Keys.hmacShaKeyFor(keyBytes);
+  }
+
+  private boolean isTokenExpired(String token) {
+    return extractExpiration(token).before(new Date());
+  }
+
+  private Date extractExpiration(String token) {
+    final Claims jwtToken = Jwts.parser()
+        .verifyWith(getSignKey())
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
+
+    return jwtToken.getExpiration();
   }
 }

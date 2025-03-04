@@ -25,11 +25,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-  private UserRepository userRepository;
-  private TokenRepository tokenRepository;
-  private PasswordEncoder passwordEncoder;
-  private JwtService jwtService;
-  private AuthenticationManager authenticationManager;
+  private final UserRepository userRepository;
+  private final TokenRepository tokenRepository;
+  private final PasswordEncoder passwordEncoder;
+  private final JwtService jwtService;
+  private final AuthenticationManager authenticationManager;
 
   @Override
   public TokenResponseDto signIn(SignInRequestDto signInRequestDto) {
@@ -63,7 +63,29 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   public TokenResponseDto refresh(String authHeader) {
-    return null;
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      throw new IllegalArgumentException("Invalid Bearer token");
+    }
+
+    final String refreshToken = authHeader.substring(7);
+    final String userEmail = jwtService.extractUsername(refreshToken);
+
+    if (userEmail == null) {
+      throw new IllegalArgumentException("Invalid Refresh token");
+    }
+
+    final UserEntity user = userRepository.findByEmail(userEmail)
+        .orElseThrow(() -> new UsernameNotFoundException("User is not exists"));
+
+    if (!jwtService.isTokenValid(refreshToken, user)) {
+      throw new IllegalArgumentException("Invalid Refresh token");
+    }
+
+    final String accessToken = jwtService.generateToken(user);
+    revokeAllUserTokens(user);
+    saveToken(user, accessToken);
+    return new TokenResponseDto(accessToken, refreshToken);
+
   }
 
   private void saveToken(UserEntity user, String token) {

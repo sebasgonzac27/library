@@ -3,11 +3,11 @@ spring:
     name: library
 
 server:
-  port: 8080
+  port: 8081
 
 security:
   jwt:
-    secret-key: 2E9vFBcJWgrcx3ciqI6TpUljf3k5pXQj
+    secret-key: 2E9vFBcJWgrcx3ciqI6TpUljf3k5pXQj2E9vFBcJWgrcx3ciqI6TpUljf3k5pXQj
     expiration: 86400000
     refresh-token:
       expiration: 604800000
